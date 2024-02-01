@@ -21,6 +21,7 @@ import java.util.List;
 public class Client {
 
     private String name;
+    private String password;
     private String gender;
     private long age;
     private String address;

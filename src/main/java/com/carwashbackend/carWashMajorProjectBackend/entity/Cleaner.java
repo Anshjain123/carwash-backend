@@ -22,6 +22,7 @@ public class Cleaner {
     @Column(name = "email", unique = true)
     private String email;
     private String name;
+    private String password;
 
     @JsonFormat(pattern = "yyyy-MM-dd")
     private Date DOB;

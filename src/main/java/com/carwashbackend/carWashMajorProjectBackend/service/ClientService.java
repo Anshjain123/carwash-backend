@@ -9,6 +9,7 @@ import com.carwashbackend.carWashMajorProjectBackend.repository.ClientJPAReposit
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,6 +30,10 @@ public class ClientService {
     @Autowired
     private CleanerJPARepository cleanerJPARepository;
 
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public ResponseEntity<String> addClient(Client client) {
 
         List<Car> allCars = client.getAllClientCars();
@@ -47,6 +52,7 @@ public class ClientService {
 
             return new ResponseEntity<String>("client with same phone number already exists", HttpStatus.CONFLICT);
         }
+        client.setPassword(passwordEncoder.encode(client.getPassword()));
         clientJPARepository.save(client);
         return new ResponseEntity<String>("Client is added successfully", HttpStatus.CREATED);
     }
@@ -115,7 +121,7 @@ public class ClientService {
         oldClient.get().setAge(client.getAge());
         oldClient.get().setGender(client.getGender());
         oldClient.get().setPlan(client.getPlan());
-
+        oldClient.get().setPassword(passwordEncoder.encode(client.getPassword()));
 
         List<Car> allCars = client.getAllClientCars();
 

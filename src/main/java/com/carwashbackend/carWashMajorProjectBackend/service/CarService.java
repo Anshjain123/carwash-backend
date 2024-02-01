@@ -10,6 +10,7 @@ import com.carwashbackend.carWashMajorProjectBackend.repository.ClientJPAReposit
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+//import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,6 +29,12 @@ public class CarService {
     @Autowired
     private ClientJPARepository clientJPARepository;
 
+//    @Autowired
+//    private SimpMessagingTemplate simpMessagingTemplate;
+
+//    @Autowired
+//    private KafkaService kafkaService;
+
     public ResponseEntity<List<Car>> getAllCars() {
 
         try {
@@ -37,6 +44,8 @@ public class CarService {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
     public ResponseEntity<String> assignCarToCleaners(CarCleanerClient carCleanerClient) {
 
@@ -74,6 +83,11 @@ public class CarService {
         cleanerJPARepository.save(cleaner.get());
         clientJPARepository.save(client.get());
 
+//        kafkaService.notifyCleaner(email);
+
+
+
+//        simpMessagingTemplate.convertAndSend("topic/userUpdates", email);
 
         return new ResponseEntity<String>("Added successfully", HttpStatus.OK);
     }

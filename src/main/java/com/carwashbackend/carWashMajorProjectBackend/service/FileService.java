@@ -35,6 +35,7 @@ public class FileService {
             e.printStackTrace();
         }
 
+        assert filename != null;
         String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("getImage/")
                 .path(filename)

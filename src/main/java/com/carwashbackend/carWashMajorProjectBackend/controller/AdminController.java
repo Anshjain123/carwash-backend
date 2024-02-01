@@ -19,6 +19,7 @@ import java.util.Map;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:5005")
+@RequestMapping("/admin")
 public class AdminController {
 
 
@@ -32,37 +33,37 @@ public class AdminController {
     @Autowired
     private CarService carService;
 
-    @PostMapping("/admin/cleaner/add")
+    @PostMapping("/cleaner/add")
     @CrossOrigin(origins = "http://localhost:5005")
     public ResponseEntity<String> addCleaner(@RequestPart("imageData") MultipartFile imageData, @RequestPart("adhaarData") MultipartFile adhaarData, @RequestPart("cleaner") Cleaner cleaner) {
         cleanerService.addCleaner(cleaner, imageData, adhaarData);
         return new ResponseEntity<>("It is fine", HttpStatus.CREATED);
     }
 
-    @GetMapping("/admin/cleaner/getAll")
-    @CrossOrigin(origins = "http://localhost:5005")
+    @GetMapping("/cleaner/getAll")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<List<Cleaner>> getAllCleaners() {
         return cleanerService.getAllCleaners();
     }
 
-    @DeleteMapping("/admin/cleaner/delete/{email}")
+    @DeleteMapping("/cleaner/delete/{email}")
     @CrossOrigin(origins = "http://localhost:5005")
     public ResponseEntity<String> deleteCleaner(@PathVariable String email) {
         return cleanerService.deleteByemail(email);
     }
 ////
-    @PutMapping("/admin/cleaner/update/{email}")
+    @PutMapping("/cleaner/update/{email}")
     @CrossOrigin(origins = "http://localhost:5005")
     public ResponseEntity<Cleaner> updateCleaner(@RequestBody Cleaner cleaner, @PathVariable String email) {
         return cleanerService.updateCleaner(cleaner, email);
     }
 
-    @PostMapping("/admin/client/add")
+    @PostMapping("/client/add")
     public ResponseEntity<String> addClient(@RequestBody Client client) {
         return clientService.addClient(client);
     }
 
-    @GetMapping("/admin/client/getAll")
+    @GetMapping("/client/getAll")
     @CrossOrigin(origins = "http://localhost:5005")
     public @ResponseBody List<Client> getAllClients() {
 
@@ -70,25 +71,25 @@ public class AdminController {
         return allClients;
     }
 
-    @DeleteMapping("/admin/client/delete/{carNumber}")
+    @DeleteMapping("/client/delete/{carNumber}")
     @CrossOrigin(origins = "http://localhost:5005")
     public ResponseEntity<String> deleteclientCar(@PathVariable String carNumber) {
         return clientService.deleteByid(carNumber);
     }
 
-    @PutMapping("/admin/client/update")
+    @PutMapping("/client/update")
     @CrossOrigin(origins = "http://localhost:5005")
     public ResponseEntity<Client> deleteclientCar(@RequestBody Client client) {
         return clientService.updateClient(client);
     }
 
-    @GetMapping("/admin/assignCars/getAll")
+    @GetMapping("/assignCars/getAll")
     @CrossOrigin(origins = "http://localhost:5005")
     public ResponseEntity<List<Car>> getAllCars() {
         return carService.getAllCars();
     }
 
-    @PostMapping("/admin/assignCars/assignCarToCleaners")
+    @PostMapping("/assignCars/assignCarToCleaners")
     @CrossOrigin(origins = "http://localhost:5005")
     public ResponseEntity<String> assignCarToCleaners(@RequestBody CarCleanerClient carCleanerClient) {
         System.out.println("Printing carCleanerClient");
@@ -97,7 +98,7 @@ public class AdminController {
     }
 
 
-    @PostMapping("/admin/assignCars/unassign")
+    @PostMapping("/assignCars/unassign")
     @CrossOrigin(origins = "http://localhost:5005")
     public ResponseEntity<String> UnassignCarFromCleaners(@RequestBody Map<String, String> jsonData) {
 
