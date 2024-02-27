@@ -49,6 +49,7 @@ public class Jwtfilter extends OncePerRequestFilter {
         if(!(request.getRequestURI().startsWith("/admin") || request.getRequestURI().startsWith("/login") || request.getRequestURI().startsWith("/getImage") || request.getRequestURI().startsWith("/getMedia"))){
 
             System.out.println("jwt filter mei aarha h!");
+            System.out.println(request.getRequestURI());
 
             String requestHeader = request.getHeader("Authorization");
 
@@ -80,7 +81,7 @@ public class Jwtfilter extends OncePerRequestFilter {
 
             } else {
                 logger.info("Invalid Header Value !! ");
-//            throw new RuntimeException("Authorisation header not present");
+                throw new RuntimeException("Authorisation header not present");
             }
 
 

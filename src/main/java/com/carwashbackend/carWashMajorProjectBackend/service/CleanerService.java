@@ -157,13 +157,13 @@ public class CleanerService {
 
         int n = files.size();
 
-        String pattern = "dd/MM/yyyy";
+        String pattern = "dd-MM-yyyy";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
 
         String date = simpleDateFormat.format(new Date());
 //        System.out.println(date);
 
-        String directory = "uploadMedia/";
+        String directory = "uploadMedia/" + date + "/" + carNumber;
 
         Path storageDirectory = Paths.get(directory);
 
@@ -172,9 +172,11 @@ public class CleanerService {
         }
 
         List<String> uris = new ArrayList<>();
+        String URI = "";
+
 
         for(int i = 0; i < n; i++) {
-            String fileName = "image" + i;
+            String fileName = "image" + i + carNumber;
             String destination = storageDirectory + "\\" + fileName;
             byte[] imageBytes = Base64.getDecoder().decode(files.get(i));
             Files.copy(new ByteArrayInputStream(imageBytes), Path.of(destination));
@@ -187,18 +189,38 @@ public class CleanerService {
             System.out.println("printing image uri in cleaner service ");
             System.out.println(uri);
             uris.add(uri);
+            URI += uri;
+            if(i < n-1) {
+                URI += ',';
+            }
             System.out.println(uri);
         }
 
+//        System.out.println("printing uris");
+//        System.out.println(uris);
         WashedCarMedia washedCarMedia = new WashedCarMedia();
-        washedCarMedia.setUris(uris);
+//        washedCarMedia.setUris(uris);
+        washedCarMedia.setURI(URI);
         washedCarMedia.setDate(date);
         washedCarMedia.setCarNumber(carNumber);
         washedCarMediaRepository.save(washedCarMedia);
+
+        WashedCarMedia washedCarMedia1 = washedCarMediaRepository.findBycarNumber(carNumber);
+
+        System.out.println(washedCarMedia1);
     }
 
     public byte[] getMedia(String filename) throws IOException {
-        String directory = "uploadMedia/";
+        String carNumber = filename.substring(6);
+        String pattern = "dd-MM-yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+        String date = simpleDateFormat.format(new Date());
+//        System.out.println(date);
+//        Date date = new Date();
+
+        String directory = "uploadMedia/" + date + "/" + carNumber;
+//        String directory = "uploadMedia/" + ;
         Path storageDirectory = Path.of(directory);
         if(!Files.exists(storageDirectory)) {
             return null;
@@ -208,7 +230,33 @@ public class CleanerService {
         byte[] data = Files.readAllBytes(destination);
 //        System.out.println(data);
         return data;
-
     }
 
+    public ResponseEntity<List<String>> getAllWashedCarToday() {
+        String pattern = "dd-MM-yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String date = simpleDateFormat.format(new Date());
+
+        try {
+
+            System.out.println(date);
+            List<WashedCarMedia> washedCarMedia = washedCarMediaRepository.findAll();
+
+            System.out.println(washedCarMedia);
+
+            List<String> res = new ArrayList<>();
+
+            for(int i = 0; i < washedCarMedia.size(); i++) {
+                String datei = washedCarMedia.get(i).getDate();
+                if(datei.equals(date)) {
+                    res.add(washedCarMedia.get(i).getCarNumber());
+                }
+            }
+
+            return new ResponseEntity<List<String>>(res, HttpStatus.OK);
+
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

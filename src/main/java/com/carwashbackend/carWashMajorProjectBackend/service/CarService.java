@@ -7,12 +7,14 @@ import com.carwashbackend.carWashMajorProjectBackend.entity.Client;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CarJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CleanerJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.ClientJPARepository;
+import com.carwashbackend.carWashMajorProjectBackend.repository.WashedCarMediaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 //import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,22 +31,20 @@ public class CarService {
     @Autowired
     private ClientJPARepository clientJPARepository;
 
-//    @Autowired
-//    private SimpMessagingTemplate simpMessagingTemplate;
 
-//    @Autowired
-//    private KafkaService kafkaService;
+    @Autowired
+    private  WashedCarMediaRepository washedCarMediaRepository;
 
     public ResponseEntity<List<Car>> getAllCars() {
 
         try {
             List<Car> allCars = carJPARepository.findAll();
+//            System.out.println("printing allcars");
             return new ResponseEntity<>(allCars, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-
 
 
     public ResponseEntity<String> assignCarToCleaners(CarCleanerClient carCleanerClient) {
@@ -117,6 +117,18 @@ public class CarService {
             return new ResponseEntity<>("Unassigned successfully!", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("such car does not exists!", HttpStatus.CONFLICT);
+        }
+    }
+
+    public ResponseEntity<String[]> getAllUrls(String carNumber, String date) {
+
+        try {
+            String URI = washedCarMediaRepository.findBycarNumberAndDate(carNumber, date);
+            String[] uris = URI.split(",");
+
+            return new ResponseEntity<>(uris, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
 }

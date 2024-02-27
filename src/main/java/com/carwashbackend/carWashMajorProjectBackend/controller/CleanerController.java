@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -48,6 +49,15 @@ public class CleanerController {
         System.out.println("printing the filename");
         System.out.println(filename);
         return cleanerService.getMedia(filename);
+    }
+
+
+    @GetMapping("/getCarWashedToday")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<List<String>> getCarWashedToday() throws ParseException {
+//        List<String> cars = this.cleanerService.getAllWashedCarToday();
+//        return new ResponseEntity<>(cars, HttpStatus.OK);
+        return cleanerService.getAllWashedCarToday();
     }
 
 }

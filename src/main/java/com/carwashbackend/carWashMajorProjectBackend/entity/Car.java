@@ -2,10 +2,7 @@ package com.carwashbackend.carWashMajorProjectBackend.entity;
 
 
 import com.fasterxml.jackson.annotation.*;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,11 +21,11 @@ public class Car {
     private String description;
     private boolean assigned;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference("client")
     private Client client;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference("cleaner")
     private Cleaner cleaner;
 }
