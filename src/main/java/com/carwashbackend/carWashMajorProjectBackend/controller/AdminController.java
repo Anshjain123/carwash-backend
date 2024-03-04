@@ -109,4 +109,23 @@ public class AdminController {
         return carService.UnassignCarFromCleaners(carNumber);
     }
 
+    @PostMapping("/getUrlsByDateAndCarNumber")
+    public ResponseEntity<String[]> getUrlByDateAndCarNumber(@RequestBody Map<String, String> data) {
+        String carNumber = data.get("carNumber");
+        String date = data.get("date");
+
+        String newDate = "";
+        newDate += date.charAt(8);
+        newDate += date.charAt(9);
+        newDate += '-';
+        newDate += date.charAt(5);
+        newDate += date.charAt(6);
+        newDate += '-';
+        newDate += date.charAt(0);
+        newDate += date.charAt(1);
+        newDate += date.charAt(2);
+        newDate += date.charAt(3);
+
+        return this.carService.getAllUrls(carNumber, newDate);
+    }
 }

@@ -4,6 +4,7 @@ import com.carwashbackend.carWashMajorProjectBackend.dto.CarCleanerClient;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Car;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Cleaner;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Client;
+import com.carwashbackend.carWashMajorProjectBackend.entity.WashedCarMedia;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CarJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CleanerJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.ClientJPARepository;
@@ -123,9 +124,17 @@ public class CarService {
     public ResponseEntity<String[]> getAllUrls(String carNumber, String date) {
 
         try {
-            String URI = washedCarMediaRepository.findBycarNumberAndDate(carNumber, date);
+//            String URI = washedCarMediaRepository.findBycarNumberAndDate(carNumber, date);
+            List<WashedCarMedia> washedCars = washedCarMediaRepository.findByDate(date);
+            String URI = "";
+            for(int i = 0; i < washedCars.size(); i++) {
+                if(washedCars.get(i).getDate().equals(date)) {
+                    URI = washedCars.get(i).getURI();
+                    break;
+                }
+            }
             String[] uris = URI.split(",");
-
+            System.out.println(uris);
             return new ResponseEntity<>(uris, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

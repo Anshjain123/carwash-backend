@@ -60,4 +60,7 @@ public class CleanerController {
         return cleanerService.getAllWashedCarToday();
     }
 
+
+
+
 }
