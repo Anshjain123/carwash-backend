@@ -1,6 +1,7 @@
 package com.carwashbackend.carWashMajorProjectBackend.service;
 
 import com.carwashbackend.carWashMajorProjectBackend.dto.CarCleanerClient;
+import com.carwashbackend.carWashMajorProjectBackend.dto.ResponseCar;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Car;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Cleaner;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Client;
@@ -40,7 +41,12 @@ public class CarService {
 
         try {
             List<Car> allCars = carJPARepository.findAll();
-//            System.out.println("printing allcars");
+//
+            for(int i = 0; i < allCars.size(); i++) {
+                Cleaner cleaner = allCars.get(i).getCleaner();
+                allCars.get(i).setCleaner(cleaner);
+            }
+
             return new ResponseEntity<>(allCars, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);

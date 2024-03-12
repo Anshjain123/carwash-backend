@@ -1,6 +1,7 @@
 package com.carwashbackend.carWashMajorProjectBackend.controller;
 
 import com.carwashbackend.carWashMajorProjectBackend.dto.CarCleanerClient;
+import com.carwashbackend.carWashMajorProjectBackend.dto.ResponseCar;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Car;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Cleaner;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Client;
@@ -110,6 +111,7 @@ public class AdminController {
     }
 
     @PostMapping("/getUrlsByDateAndCarNumber")
+    @CrossOrigin(origins = "*")
     public ResponseEntity<String[]> getUrlByDateAndCarNumber(@RequestBody Map<String, String> data) {
         String carNumber = data.get("carNumber");
         String date = data.get("date");
