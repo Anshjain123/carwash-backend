@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -87,7 +88,28 @@ public class AdminController {
     @GetMapping("/assignCars/getAll")
     @CrossOrigin(origins = "http://localhost:5005")
     public ResponseEntity<List<Car>> getAllCars() {
-        return carService.getAllCars();
+        try {
+            List<Car> allCars = carService.getAllCars();
+
+            return new ResponseEntity<>(allCars, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/assignCars/getAllAssignedCleaners")
+    @CrossOrigin(origins = "http://localhost:5005")
+    public ResponseEntity<HashMap<String, String>> getAllCarsCleaners() {
+        try {
+            HashMap<String, String> res = this.carService.getAllCarsAssignedCleaners();
+
+            System.out.println("Printing map");
+            System.out.println(res);
+            return new ResponseEntity<>(res, HttpStatus.OK);
+
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @PostMapping("/assignCars/assignCarToCleaners")

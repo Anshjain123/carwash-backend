@@ -129,7 +129,7 @@ public class ClientService {
             Optional<Car> car = carJPARepository.findById(allCars.get(i).getCarNumber());
             if(car.isPresent()) {
                 car.get().setCarModel(allCars.get(i).getCarModel());
-                car.get().setAssigned(allCars.get(i).isAssigned());
+//                car.get().setAssigned(allCars.get(i).isAssigned());
                 car.get().setDescription(allCars.get(i).getDescription());
             } else {
                 oldClient.get().getAllClientCars().add(allCars.get(i));

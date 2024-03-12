@@ -3,10 +3,7 @@ package com.carwashbackend.carWashMajorProjectBackend.entity;
 
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,7 +22,7 @@ public class Car {
     @JsonBackReference("client")
     private Client client;
 
-    @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference("cleaner")
+    @ManyToOne(fetch = FetchType.EAGER)
     private Cleaner cleaner;
 }

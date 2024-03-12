@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,22 +38,37 @@ public class CarService {
     @Autowired
     private  WashedCarMediaRepository washedCarMediaRepository;
 
-    public ResponseEntity<List<Car>> getAllCars() {
+    public List<Car> getAllCars() {
 
         try {
             List<Car> allCars = carJPARepository.findAll();
-//
-            for(int i = 0; i < allCars.size(); i++) {
-                Cleaner cleaner = allCars.get(i).getCleaner();
-                allCars.get(i).setCleaner(cleaner);
-            }
-
-            return new ResponseEntity<>(allCars, HttpStatus.OK);
+//            System.out.println("yes it is coming!");
+            return allCars;
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new RuntimeException(e);
         }
     }
 
+    public HashMap<String, String> getAllCarsAssignedCleaners() {
+        List<Car> allCars = getAllCars();
+
+        HashMap<String, String> res = new HashMap<>();
+
+        for(int i = 0; i < allCars.size(); i++) {
+            System.out.println("Yes inside for loop it is coming!");
+            String key = allCars.get(i).getCarNumber();
+//            String value = allCars.get(i).getCleaner().getEmail();
+            Cleaner cleaner = allCars.get(i).getCleaner();
+            if(cleaner != null) {
+                String value = cleaner.getEmail();
+                res.put(key, value);
+            }
+//            String value = cleaner.getEmail()
+//            res.put(key, value);
+        }
+
+        return res;
+    }
 
     public ResponseEntity<String> assignCarToCleaners(CarCleanerClient carCleanerClient) {
 
