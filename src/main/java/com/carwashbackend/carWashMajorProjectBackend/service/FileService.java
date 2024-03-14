@@ -1,6 +1,8 @@
 package com.carwashbackend.carWashMajorProjectBackend.service;
 
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -36,7 +38,9 @@ public class FileService {
         }
 
         assert filename != null;
-        String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
+        String uri = "";
+
+        uri = ServletUriComponentsBuilder.fromCurrentContextPath()
                 .path("getImage/")
                 .path(filename)
                 .path(uniqueId)
@@ -54,6 +58,7 @@ public class FileService {
 
         byte[] byteArray = Files.readAllBytes(destination);
         return byteArray;
+
     }
 
 }

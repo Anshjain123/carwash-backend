@@ -46,7 +46,11 @@ public class Jwtfilter extends OncePerRequestFilter {
 //            throw new RuntimeException(e);
 //        }
         //Authorization
-        if(!(request.getRequestURI().startsWith("/admin") || request.getRequestURI().startsWith("/login") || request.getRequestURI().startsWith("/getImage") || request.getRequestURI().startsWith("/getMedia"))){
+
+        if(!(request.getRequestURI().startsWith("/admin") || request.getRequestURI().startsWith("/login") || request.getRequestURI().startsWith("/getImage") || request.getRequestURI().startsWith("/getPdf") || request.getRequestURI().startsWith("/getMedia"))){
+
+
+            System.out.println(request.getRequestURI());
 
             System.out.println("jwt filter mei aarha h!");
             System.out.println(request.getRequestURI());
