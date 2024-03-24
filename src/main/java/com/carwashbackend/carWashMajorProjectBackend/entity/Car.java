@@ -4,6 +4,9 @@ package com.carwashbackend.carWashMajorProjectBackend.entity;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.util.Date;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -18,6 +21,9 @@ public class Car {
     private String description;
     private boolean assigned;
     private String plan;
+
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    private Date planValidity;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference("client")

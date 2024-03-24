@@ -12,7 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,7 +37,7 @@ public class ClientService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public ResponseEntity<String> addClient(Client client) {
+    public ResponseEntity<String> addClient(Client client) throws ParseException {
 
         List<Car> allCars = client.getAllClientCars();
 
@@ -53,6 +56,16 @@ public class ClientService {
             return new ResponseEntity<String>("client with same phone number already exists", HttpStatus.CONFLICT);
         }
         client.setPassword(passwordEncoder.encode(client.getPassword()));
+
+        Date date = client.getAllClientCars().get(0).getPlanValidity();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+        String formattedDate = dateFormat.format(date);
+        date = dateFormat.parse(formattedDate);
+
+        client.getAllClientCars().get(0).setPlanValidity(date);
+        System.out.println("printing validityplan date");
+        System.out.println(client.getAllClientCars().get(0).getPlanValidity());
         clientJPARepository.save(client);
         return new ResponseEntity<String>("Client is added successfully", HttpStatus.CREATED);
     }

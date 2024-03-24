@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +62,7 @@ public class AdminController {
     }
 
     @PostMapping("/client/add")
-    public ResponseEntity<String> addClient(@RequestBody Client client) {
+    public ResponseEntity<String> addClient(@RequestBody Client client) throws ParseException {
         return clientService.addClient(client);
     }
 
