@@ -11,6 +11,5 @@ public interface WashedCarMediaRepository extends JpaRepository<WashedCarMedia, 
 
     WashedCarMedia findBycarNumber(String carNumber);
     List<WashedCarMedia> findByDate(String date);
-
     String findBycarNumberAndDate(String carNumber, String date);
 }

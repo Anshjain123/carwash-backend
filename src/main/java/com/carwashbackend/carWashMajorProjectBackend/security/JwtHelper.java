@@ -81,6 +81,11 @@ public class JwtHelper {
 
         try {
             Jwts.parserBuilder().setSigningKey(getSignKey()).build().parseClaimsJws(token);
+            //parseClaimsJws is used to parse and validate a JWT-encoded string
+            //Parsing: It decodes the JWT string, which consists of three parts separated by dots: the header, the payload (claims), and the signature.
+            //Verification: It verifies the signature of the JWT to ensure that the token has not been tampered with.
+            //Claims Extraction: It extracts the claims (payload) from the JWT, which contain information about the entity (user or client) and any additional metadata.
+
             return true;
         }catch (Exception e){
             throw new RuntimeException("validation failed");

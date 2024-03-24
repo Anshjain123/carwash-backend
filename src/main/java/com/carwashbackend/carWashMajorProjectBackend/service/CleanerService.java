@@ -4,7 +4,9 @@ package com.carwashbackend.carWashMajorProjectBackend.service;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Car;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Cleaner;
 import com.carwashbackend.carWashMajorProjectBackend.entity.WashedCarMedia;
+import com.carwashbackend.carWashMajorProjectBackend.entity.WashedCarMediaExteriorAndInterior;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CleanerJPARepository;
+import com.carwashbackend.carWashMajorProjectBackend.repository.WashedCarMediaExteriorAndInteriorRepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.WashedCarMediaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -36,14 +38,17 @@ public class CleanerService {
     @Autowired
     private FileService fileService;
 
-
     @Autowired
     private PasswordEncoder passwordEncoder;
-
 
     @Autowired
     private WashedCarMediaRepository washedCarMediaRepository;
 
+    @Autowired
+    private WashedCarMediaExteriorAndInteriorRepository washedCarMediaExteriorAndInteriorRepository;
+
+
+    public int cnt = 0;
     public ResponseEntity<String> addCleaner(Cleaner cleaner, MultipartFile imageData, MultipartFile adhaarData) {
 
         if(cleanerJPARepository.existsById(cleaner.getEmail())) {
@@ -153,15 +158,11 @@ public class CleanerService {
         }
     }
 
-    public void addWashedCarMedia(List<String> files, String carNumber) throws IOException {
 
+    public String getURI(List<String> files, String carNumber) throws IOException {
         int n = files.size();
 
-        String pattern = "dd-MM-yyyy";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-
-        String date = simpleDateFormat.format(new Date());
-//        System.out.println(date);
+        String date = getDate();
 
         String directory = "uploadMedia/" + date + "/" + carNumber;
 
@@ -176,7 +177,7 @@ public class CleanerService {
 
 
         for(int i = 0; i < n; i++) {
-            String fileName = "image" + i + carNumber;
+            String fileName = "image" + cnt++ + carNumber;
             String destination = storageDirectory + "\\" + fileName;
             byte[] imageBytes = Base64.getDecoder().decode(files.get(i));
             Files.copy(new ByteArrayInputStream(imageBytes), Path.of(destination));
@@ -196,28 +197,52 @@ public class CleanerService {
             System.out.println(uri);
         }
 
-//        System.out.println("printing uris");
-//        System.out.println(uris);
+        return URI;
+    }
+
+    public String getDate() {
+        String pattern = "dd-MM-yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+        String date = simpleDateFormat.format(new Date());
+        return date;
+    }
+    public void addWashedCarMedia(List<String> files, String carNumber) throws IOException {
+
+
+        String URI = getURI(files, carNumber);
+        String date = getDate();
         WashedCarMedia washedCarMedia = new WashedCarMedia();
-//        washedCarMedia.setUris(uris);
         washedCarMedia.setURI(URI);
         washedCarMedia.setDate(date);
         washedCarMedia.setCarNumber(carNumber);
         washedCarMediaRepository.save(washedCarMedia);
 
-        WashedCarMedia washedCarMedia1 = washedCarMediaRepository.findBycarNumber(carNumber);
+//        WashedCarMedia washedCarMedia1 = washedCarMediaRepository.findBycarNumber(carNumber);
+//
+//        System.out.println(washedCarMedia1);
+    }
 
-        System.out.println(washedCarMedia1);
+    public void addWashedCarMedia(List<String> ExtFiles, List<String> IntFiles, String carNumber) throws IOException {
+
+        String ExtURI = getURI(ExtFiles, carNumber);
+        String IntURI = getURI(IntFiles, carNumber);
+        String date = getDate();
+
+        WashedCarMediaExteriorAndInterior washedCarMediaExteriorAndInterior = new WashedCarMediaExteriorAndInterior();
+
+        washedCarMediaExteriorAndInterior.setExtURI(ExtURI);
+        washedCarMediaExteriorAndInterior.setIntURI(IntURI);
+        washedCarMediaExteriorAndInterior.setDate(date);
+        washedCarMediaExteriorAndInterior.setCarNumber(carNumber);
+
+        washedCarMediaExteriorAndInteriorRepository.save(washedCarMediaExteriorAndInterior);
+
     }
 
     public byte[] getMedia(String filename) throws IOException {
         String carNumber = filename.substring(6);
-        String pattern = "dd-MM-yyyy";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-
-        String date = simpleDateFormat.format(new Date());
-//        System.out.println(date);
-//        Date date = new Date();
+        String date = getDate();
 
         String directory = "uploadMedia/" + date + "/" + carNumber;
 //        String directory = "uploadMedia/" + ;
@@ -233,14 +258,13 @@ public class CleanerService {
     }
 
     public ResponseEntity<List<String>> getAllWashedCarToday() {
-        String pattern = "dd-MM-yyyy";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        String date = simpleDateFormat.format(new Date());
+        String date = getDate();
 
         try {
 
             System.out.println(date);
             List<WashedCarMedia> washedCarMedia = washedCarMediaRepository.findAll();
+            List<WashedCarMediaExteriorAndInterior> washedCarMediaExteriorAndInteriors = washedCarMediaExteriorAndInteriorRepository.findAll();
 
             System.out.println(washedCarMedia);
 
@@ -253,10 +277,20 @@ public class CleanerService {
                 }
             }
 
+            for(int i = 0; i < washedCarMediaExteriorAndInteriors.size(); i++) {
+                String datei = washedCarMediaExteriorAndInteriors.get(i).getDate();
+                if(datei.equals(date)) {
+                    res.add(washedCarMediaExteriorAndInteriors.get(i).getCarNumber());
+                }
+            }
+
+
             return new ResponseEntity<List<String>>(res, HttpStatus.OK);
 
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
         }
     }
+
+
 }
