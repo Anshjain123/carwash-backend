@@ -177,7 +177,8 @@ public class CleanerService {
 
 
         for(int i = 0; i < n; i++) {
-            String fileName = "image" + cnt++ + carNumber;
+            String fileName = "image" + cnt + carNumber;
+            cnt++;
             String destination = storageDirectory + "\\" + fileName;
             byte[] imageBytes = Base64.getDecoder().decode(files.get(i));
             Files.copy(new ByteArrayInputStream(imageBytes), Path.of(destination));

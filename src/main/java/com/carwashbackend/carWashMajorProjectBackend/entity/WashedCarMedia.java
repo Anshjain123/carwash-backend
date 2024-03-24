@@ -2,10 +2,7 @@ package com.carwashbackend.carWashMajorProjectBackend.entity;
 
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.boot.convert.DataSizeUnit;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -30,6 +27,7 @@ public class WashedCarMedia {
 //    @Json
 //    private List<String> uris;
 
+    @Column(length = 500)
     private String URI;
 
     private String carNumber;

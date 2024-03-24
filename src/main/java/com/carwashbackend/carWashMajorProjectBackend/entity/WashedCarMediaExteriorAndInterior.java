@@ -1,6 +1,7 @@
 package com.carwashbackend.carWashMajorProjectBackend.entity;
 
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.*;
@@ -18,7 +19,10 @@ public class WashedCarMediaExteriorAndInterior {
     @Id
     private String carNumber;
 
+
+    @Column(length = 500)
     private String ExtURI;
+    @Column(length = 500)
     private String IntURI;
 
     @DateTimeFormat(pattern = "dd-MM-yyyy")

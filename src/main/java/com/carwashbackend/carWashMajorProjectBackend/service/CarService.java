@@ -2,14 +2,8 @@ package com.carwashbackend.carWashMajorProjectBackend.service;
 
 import com.carwashbackend.carWashMajorProjectBackend.dto.CarCleanerClient;
 import com.carwashbackend.carWashMajorProjectBackend.dto.ResponseCar;
-import com.carwashbackend.carWashMajorProjectBackend.entity.Car;
-import com.carwashbackend.carWashMajorProjectBackend.entity.Cleaner;
-import com.carwashbackend.carWashMajorProjectBackend.entity.Client;
-import com.carwashbackend.carWashMajorProjectBackend.entity.WashedCarMedia;
-import com.carwashbackend.carWashMajorProjectBackend.repository.CarJPARepository;
-import com.carwashbackend.carWashMajorProjectBackend.repository.CleanerJPARepository;
-import com.carwashbackend.carWashMajorProjectBackend.repository.ClientJPARepository;
-import com.carwashbackend.carWashMajorProjectBackend.repository.WashedCarMediaRepository;
+import com.carwashbackend.carWashMajorProjectBackend.entity.*;
+import com.carwashbackend.carWashMajorProjectBackend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +28,11 @@ public class CarService {
     @Autowired
     private ClientJPARepository clientJPARepository;
 
-
     @Autowired
     private  WashedCarMediaRepository washedCarMediaRepository;
+
+    @Autowired
+    private WashedCarMediaExteriorAndInteriorRepository washedCarMediaExteriorAndInteriorRepository;
 
     public List<Car> getAllCars() {
 
@@ -157,6 +153,50 @@ public class CarService {
             }
             String[] uris = URI.split(",");
             System.out.println(uris);
+
+            List<WashedCarMediaExteriorAndInterior> washedCarMediaExteriorAndInteriors = washedCarMediaExteriorAndInteriorRepository.findByDate(date);
+
+            if(URI.equals("")) {
+                String ExtURI = "";
+                String IntURI = "";
+                for(int i = 0; i < washedCarMediaExteriorAndInteriors.size(); i++) {
+                    if(washedCarMediaExteriorAndInteriors.get(i).getDate().equals(date)) {
+                        ExtURI = washedCarMediaExteriorAndInteriors.get(i).getExtURI();
+                        IntURI = washedCarMediaExteriorAndInteriors.get(i).getIntURI();
+                        break;
+                    }
+                }
+                String[] Exturis = ExtURI.split(",");
+                String[] Inturis = IntURI.split(",");
+
+
+
+
+                int len = Exturis.length + Inturis.length;
+
+                System.out.println(len);
+
+                String[] res = new String[len];
+
+                int i = 0, j = 0, k = 0;
+
+                while(i < Exturis.length) {
+                    res[k] = Exturis[i];
+                    k++;
+                    i++;
+                }
+                while(j < Inturis.length) {
+                    res[k] = Inturis[j];
+                    k++;
+                    j++;
+                }
+
+                uris = res;
+                System.out.println("printing ext and int uris");
+                System.out.println(uris);
+            }
+
+
             return new ResponseEntity<>(uris, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
