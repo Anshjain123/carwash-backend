@@ -13,5 +13,6 @@ public interface CarJPARepository extends JpaRepository<Car, String> {
 
     List<Car> findByClient(Client client);
     void deleteByClient(Client client);
+    void deleteById(String carNumber);
 
 }

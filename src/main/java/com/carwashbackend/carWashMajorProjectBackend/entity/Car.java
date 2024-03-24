@@ -17,6 +17,7 @@ public class Car {
     private String carNumber;
     private String description;
     private boolean assigned;
+    private String plan;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference("client")

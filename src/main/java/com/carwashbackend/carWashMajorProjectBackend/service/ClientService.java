@@ -75,20 +75,10 @@ public class ClientService {
         if(car.isPresent()) {
 //            System.out.println("YEs here we are comming heenifonw");
             Client client = car.get().getClient();
+            List<Car> clientCars = client.getAllClientCars();
+            clientCars.remove(car.get());
+            client.setAllClientCars(clientCars);
             client.getAllClientCars().remove(car.get());
-
-
-//            car.get().setClient(null);
-//
-              List<Car> allCars = carJPARepository.findByClient(client);
-
-//            System.out.println("Printing all cars");
-//            System.out.println(allCars.size());
-//            System.out.println(allCars);
-
-            if(allCars.size() == 0) {
-                clientJPARepository.deleteById(client.getPhone());
-            }
 
             Cleaner cleaner = car.get().getCleaner();
             if(cleaner != null) {
@@ -100,8 +90,20 @@ public class ClientService {
                 System.out.println(cleaner.getAllCleanerCars().size());
             }
 
+
             carJPARepository.deleteById(carNumber);
-            clientJPARepository.save(client);
+            List<Car> allCars = carJPARepository.findByClient(client);
+
+            System.out.println("Printing all cars size");
+            System.out.println(allCars.size());
+//            System.out.println(allCars);
+
+            if(allCars.size() == 0) {
+                clientJPARepository.deleteById(client.getPhone());
+            } else {
+                clientJPARepository.save(client);
+            }
+
 
             return new ResponseEntity<>("Deleted sucessful", HttpStatus.OK);
         }
@@ -120,8 +122,9 @@ public class ClientService {
         oldClient.get().setAddress(client.getAddress());
         oldClient.get().setAge(client.getAge());
         oldClient.get().setGender(client.getGender());
-        oldClient.get().setPlan(client.getPlan());
+//        oldClient.get().setPlan(client.getPlan());
         oldClient.get().setPassword(passwordEncoder.encode(client.getPassword()));
+        oldClient.get().setEmail(client.getEmail());
 
         List<Car> allCars = client.getAllClientCars();
 
@@ -140,7 +143,7 @@ public class ClientService {
 
         Optional<Client> testClient = clientJPARepository.findById(client.getPhone());
 
-        System.out.println("Printing updated clinet");
+        System.out.println("Printing updated client");
         System.out.println(testClient.get().getName());
 
         return new ResponseEntity<>(oldClient.get(), HttpStatus.CREATED);

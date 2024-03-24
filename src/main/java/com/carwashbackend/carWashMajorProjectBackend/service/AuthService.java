@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CleanerAuthService {
+public class AuthService {
 
 
 
@@ -23,6 +23,9 @@ public class CleanerAuthService {
 
     @Autowired
     private CleanerDetailServiceImp cleanerDetailServiceImp;
+
+    @Autowired
+    private ClientDetailServiceImp clientDetailServiceImp;
 
     @Autowired
     private JwtHelper helper;
@@ -36,30 +39,41 @@ public class CleanerAuthService {
 
         String username = request.getUsername();
         String password = request.getPassword();
+        String type = request.getType();
 
         System.out.println("printing username");
         System.out.println(username);
         System.out.println("printing password");
         System.out.println(password);
 
-        if (!doAuthenticate(username, password)) {
+        if (!doAuthenticate(username, password, type)) {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        UserDetails userDetails = cleanerDetailServiceImp.loadUserByUsername(username);
+        UserDetails userDetails;
 
-        String token = helper.generateToken(userDetails, "cleaner");
+        if(type.equals("cleaner")) {
+            userDetails = cleanerDetailServiceImp.loadUserByUsername(username);
+        } else {
+            userDetails = clientDetailServiceImp.loadUserByUsername(username);
+        }
+
+        String token = helper.generateToken(userDetails, type);
 
         JwtResponse response = JwtResponse.builder().jwtToken(token).username(userDetails.getUsername()).build();
 
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    boolean doAuthenticate(String username, String password) {
+    boolean doAuthenticate(String username, String password, String type) {
 
         try {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
-            authenticationToken.setDetails("cleaner");
+            if(type.equals("cleaner")) {
+                authenticationToken.setDetails("cleaner");
+            } else {
+                authenticationToken.setDetails("client");
+            }
 
             if(authenticationManager.authenticate(authenticationToken).isAuthenticated()) {
                 return true;

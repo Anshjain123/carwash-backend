@@ -27,7 +27,7 @@ public class Client {
     private String address;
     @Id
     private String phone;
-    private String plan;
+    private String email;
 
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference("client")

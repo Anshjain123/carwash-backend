@@ -1,6 +1,7 @@
 package com.carwashbackend.carWashMajorProjectBackend.config;
 
 import com.carwashbackend.carWashMajorProjectBackend.entity.Cleaner;
+import com.carwashbackend.carWashMajorProjectBackend.entity.Client;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CleanerJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.ClientJPARepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,10 +51,22 @@ public class CustomAuthenticationManager implements AuthenticationManager {
                     System.out.println("Yes password are same");
                     List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
                     UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(), authorities);
-//                    newAuthentication.setAuthenticated(true);
-//                    authentication.setAuthenticated(true);
-//                    System.out.println("Printing authentication token in manager");
-//                    System.out.println(newAuthentication);
+//
+                    return newAuthentication;
+                } else {
+                    throw new BadCredentialsException("Wrong password!");
+                }
+            } else {
+                throw new BadCredentialsException("Wrong username");
+            }
+        } else {
+            Optional<Client> client = clientJPARepository.findById(username);
+            if(client.isPresent()) {
+                if(passwordEncoder.matches(authentication.getCredentials().toString(), client.get().getPassword())) {
+                    System.out.println("Yes password are same!");
+                    List<GrantedAuthority> authorities = new ArrayList<>();
+                    UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(), authorities);
+
                     return newAuthentication;
                 } else {
                     throw new BadCredentialsException("Wrong password!");
@@ -62,6 +75,5 @@ public class CustomAuthenticationManager implements AuthenticationManager {
                 throw new BadCredentialsException("Wrong username");
             }
         }
-        return authentication;
     }
 }
