@@ -8,6 +8,8 @@ import com.carwashbackend.carWashMajorProjectBackend.entity.Client;
 import com.carwashbackend.carWashMajorProjectBackend.service.CarService;
 import com.carwashbackend.carWashMajorProjectBackend.service.CleanerService;
 import com.carwashbackend.carWashMajorProjectBackend.service.ClientService;
+import com.carwashbackend.carWashMajorProjectBackend.service.MailService;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +37,9 @@ public class AdminController {
 
     @Autowired
     private CarService carService;
+
+    @Autowired
+    private MailService mailService;
 
     @PostMapping("/cleaner/add")
     @CrossOrigin(origins = "http://localhost:5005")
@@ -152,5 +157,12 @@ public class AdminController {
         newDate += date.charAt(3);
 
         return this.carService.getAllUrls(carNumber, newDate);
+    }
+
+    @PostMapping("/client/notify")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<Void> NotifyClient(@RequestBody Map<String, String> jsonData) {
+        String carNumber = jsonData.get("carNumber");
+        return mailService.sendEmail(carNumber);
     }
 }
