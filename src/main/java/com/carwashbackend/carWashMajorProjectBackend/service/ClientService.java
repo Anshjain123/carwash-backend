@@ -9,6 +9,7 @@ import com.carwashbackend.carWashMajorProjectBackend.repository.ClientJPAReposit
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -160,6 +161,26 @@ public class ClientService {
         System.out.println(testClient.get().getName());
 
         return new ResponseEntity<>(oldClient.get(), HttpStatus.CREATED);
+    }
+
+
+    public ResponseEntity<List<Car>> getAllClientCars(String username) {
+
+        Optional<Client> client = clientJPARepository.findById(username);
+
+        if(client.isPresent()) {
+            try {
+                List<Car> allClientCars = client.get().getAllClientCars();
+
+                return new ResponseEntity<>(allClientCars, HttpStatus.OK);
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+        } else {
+            throw new BadCredentialsException("No such client exists!");
+        }
+
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

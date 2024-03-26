@@ -75,7 +75,10 @@ public class AuthService {
                 authenticationToken.setDetails("client");
             }
 
+
+
             if(authenticationManager.authenticate(authenticationToken).isAuthenticated()) {
+
                 return true;
             } else {
                 return false;

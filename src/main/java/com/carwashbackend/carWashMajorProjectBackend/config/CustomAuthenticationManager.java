@@ -44,8 +44,9 @@ public class CustomAuthenticationManager implements AuthenticationManager {
 //        System.out.println("Printing credentials in customAutgentication manager");
 //        System.out.println(authentication.getCredentials());
 
-        if(userType == "cleaner") {
+        if(userType.equals("cleaner")) {
             Optional<Cleaner> cleaner = cleanerJPARepository.findById(username);
+            System.out.println("debug");
             if(cleaner.isPresent()) {
                 if(passwordEncoder.matches(authentication.getCredentials().toString(), cleaner.get().getPassword())) {
                     System.out.println("Yes password are same");
