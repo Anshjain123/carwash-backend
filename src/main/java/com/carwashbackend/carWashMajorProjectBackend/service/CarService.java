@@ -170,8 +170,10 @@ public class CarService {
                 String[] Inturis = IntURI.split(",");
 
 
-
-
+                if(ExtURI.equals("") && IntURI.equals("")) {
+                    String[] res = new String[0];
+                    return new ResponseEntity<>(res, HttpStatus.OK);
+                }
                 int len = Exturis.length + Inturis.length;
 
                 System.out.println(len);

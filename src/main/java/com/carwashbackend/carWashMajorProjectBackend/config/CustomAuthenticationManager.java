@@ -28,6 +28,7 @@ public class CustomAuthenticationManager implements AuthenticationManager {
     @Autowired
     private CleanerJPARepository cleanerJPARepository;
 
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -48,13 +49,16 @@ public class CustomAuthenticationManager implements AuthenticationManager {
             Optional<Cleaner> cleaner = cleanerJPARepository.findById(username);
             System.out.println("debug");
             if(cleaner.isPresent()) {
-                if(passwordEncoder.matches(authentication.getCredentials().toString(), cleaner.get().getPassword())) {
+                boolean flag = passwordEncoder.matches(authentication.getCredentials().toString(), cleaner.get().getPassword());
+                System.out.println(flag);
+                if(flag == true) {
                     System.out.println("Yes password are same");
                     List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
                     UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(), authorities);
 //
                     return newAuthentication;
                 } else {
+//                    System.out.println("wrong");
                     throw new BadCredentialsException("Wrong password!");
                 }
             } else {
@@ -63,7 +67,12 @@ public class CustomAuthenticationManager implements AuthenticationManager {
         } else {
             Optional<Client> client = clientJPARepository.findById(username);
             if(client.isPresent()) {
-                if(passwordEncoder.matches(authentication.getCredentials().toString(), client.get().getPassword())) {
+//                System.out.println(client.get().getPassword());
+                boolean flag = passwordEncoder.matches(authentication.getCredentials().toString(), client.get().getPassword());
+                System.out.println(authentication.getCredentials().toString());
+                System.out.println(flag);
+                if(flag == true) {
+//                    System.out.println("debug client");
                     System.out.println("Yes password are same!");
                     List<GrantedAuthority> authorities = new ArrayList<>();
                     UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(), authorities);

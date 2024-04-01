@@ -7,6 +7,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -32,4 +33,9 @@ public class Car {
     @JsonBackReference("cleaner")
     @ManyToOne(fetch = FetchType.EAGER)
     private Cleaner cleaner;
+
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference("carPayment")
+    List<Payment> allCarPayments;
+
 }

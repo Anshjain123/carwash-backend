@@ -3,6 +3,7 @@ package com.carwashbackend.carWashMajorProjectBackend.service;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Car;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Cleaner;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Client;
+import com.carwashbackend.carWashMajorProjectBackend.entity.Payment;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CarJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CleanerJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.ClientJPARepository;
@@ -56,6 +57,7 @@ public class ClientService {
 
             return new ResponseEntity<String>("client with same phone number already exists", HttpStatus.CONFLICT);
         }
+
         client.setPassword(passwordEncoder.encode(client.getPassword()));
 
         Date date = client.getAllClientCars().get(0).getPlanValidity();
@@ -93,6 +95,11 @@ public class ClientService {
             clientCars.remove(car.get());
             client.setAllClientCars(clientCars);
             client.getAllClientCars().remove(car.get());
+
+            List<Payment> allClientPayments = car.get().getAllCarPayments();
+            for(int i = 0; i < allClientPayments.size(); i++) {
+                allClientPayments.get(i).setClient(null);
+            }
 
             Cleaner cleaner = car.get().getCleaner();
             if(cleaner != null) {
@@ -137,9 +144,10 @@ public class ClientService {
         oldClient.get().setAge(client.getAge());
         oldClient.get().setGender(client.getGender());
 //        oldClient.get().setPlan(client.getPlan());
-        oldClient.get().setPassword(passwordEncoder.encode(client.getPassword()));
+//        System.out.println("printing client password " + client.getPassword());
+//        oldClient.get().setPassword(client.getPassword());
         oldClient.get().setEmail(client.getEmail());
-
+        oldClient.get().setAllClientPayments(client.getAllClientPayments());
         List<Car> allCars = client.getAllClientCars();
 
         for(int i = 0; i < allCars.size(); i++) {

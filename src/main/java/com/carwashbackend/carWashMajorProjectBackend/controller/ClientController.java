@@ -53,7 +53,7 @@ public class ClientController {
         newDate += date.charAt(2);
         newDate += date.charAt(3);
 
-//        System.out.println(n);
+        System.out.println("newDate " + newDate);
 
         return this.carService.getAllUrls(carNumber, newDate);
     }

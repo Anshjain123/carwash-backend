@@ -45,7 +45,7 @@ public class MailService {
         Optional<Car> car = carJPARepository.findById(carNumber);
         if(!car.isPresent()) {
             System.out.println("Yes it is not present");
-            throw new BadCredentialsException("no such car exists!");
+            throw new BadCredentialsException("not found");
         }
         System.out.println("Yes in mail service it is coming!");
         String to = car.get().getClient().getEmail();
@@ -54,7 +54,12 @@ public class MailService {
         String planValidity = String.valueOf(car.get().getPlanValidity());
         String message = "Dear customer your car wash plan for carnumber " + carNumber + " is going to expire on " + planValidity + " kindly renew it at earliest to get the best washing services at door step";
 
+        return send(from, to, message, subject);
 
+    }
+
+
+    public ResponseEntity<Void> send(String from, String to, String message, String subject) {
 
         // variable for gmail;
 
@@ -117,8 +122,6 @@ public class MailService {
 
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-
 
 }
 

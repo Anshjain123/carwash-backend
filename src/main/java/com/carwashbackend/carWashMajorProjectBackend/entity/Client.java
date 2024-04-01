@@ -33,5 +33,8 @@ public class Client {
     @JsonManagedReference("client")
     private List<Car> allClientCars;
 
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference("clientPayment")
+    List<Payment> allClientPayments;
 
 }

@@ -127,7 +127,7 @@ public class CleanerService {
         newCleaner.setPhone(cleaner.getPhone());
         newCleaner.setCurrAdd(cleaner.getCurrAdd());
         newCleaner.setPermanentAdd(cleaner.getPermanentAdd());
-        newCleaner.setPassword(passwordEncoder.encode(cleaner.getPassword()));
+//        newCleaner.setPassword(passwordEncoder.encode(cleaner.getPassword()));
 
         try {
             cleanerJPARepository.save(newCleaner);
