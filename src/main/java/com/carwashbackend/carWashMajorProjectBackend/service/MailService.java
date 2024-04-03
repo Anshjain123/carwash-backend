@@ -83,6 +83,8 @@ public class MailService {
         properties.put("mail.smtp.user", from);
         properties.put("mail.smtp.password",pass);
 
+        // these properties tell the javamail api where to connect to send the mail
+
         // step 1 get the session object
 
 

@@ -29,6 +29,11 @@ public class ClientController {
         return clientService.getAllClientCars(username);
     }
 
+    @GetMapping("client/validateToken")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<Void> validateToken() {
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @PostMapping("/client/getUrlsByDateAndCarNumber")
     @CrossOrigin(origins = "*")

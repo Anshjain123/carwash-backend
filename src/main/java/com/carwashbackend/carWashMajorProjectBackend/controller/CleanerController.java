@@ -42,6 +42,11 @@ public class CleanerController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @GetMapping("/cleaner/validateToken")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<Void> validateToken() {
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
     @PostMapping("/cleaner/postMediaExtAndInt")
     @CrossOrigin(origins = "*")
     public ResponseEntity<Void> postMediaExtAndInt(@RequestBody Map<Object, Object> mp) throws IOException {

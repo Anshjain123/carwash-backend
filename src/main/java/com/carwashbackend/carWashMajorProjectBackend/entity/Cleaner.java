@@ -29,6 +29,8 @@ public class Cleaner {
 
     private String currAdd;
     private String permanentAdd;
+
+
     private String phone;
     private String gender;
     private String ImageUrl;
@@ -37,4 +39,5 @@ public class Cleaner {
     @OneToMany(mappedBy = "cleaner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference("cleaner")
     private List<Car> allCleanerCars;
+
 }

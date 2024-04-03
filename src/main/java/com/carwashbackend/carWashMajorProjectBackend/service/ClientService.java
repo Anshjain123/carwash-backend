@@ -143,6 +143,7 @@ public class ClientService {
         oldClient.get().setAddress(client.getAddress());
         oldClient.get().setAge(client.getAge());
         oldClient.get().setGender(client.getGender());
+        oldClient.get().setAllClientAddresses(client.getAllClientAddresses());
 //        oldClient.get().setPlan(client.getPlan());
 //        System.out.println("printing client password " + client.getPassword());
 //        oldClient.get().setPassword(client.getPassword());
