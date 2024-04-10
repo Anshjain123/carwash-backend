@@ -1,9 +1,6 @@
 package com.carwashbackend.carWashMajorProjectBackend.service;
 
-import com.carwashbackend.carWashMajorProjectBackend.entity.Car;
-import com.carwashbackend.carWashMajorProjectBackend.entity.Cleaner;
-import com.carwashbackend.carWashMajorProjectBackend.entity.Client;
-import com.carwashbackend.carWashMajorProjectBackend.entity.Payment;
+import com.carwashbackend.carWashMajorProjectBackend.entity.*;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CarJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CleanerJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.ClientJPARepository;
@@ -16,10 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Service
@@ -191,5 +185,81 @@ public class ClientService {
 
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
+    public ResponseEntity<List<Address>> getClientAddress(String username) {
+        Optional<Client> client = clientJPARepository.findById(username);
+
+        if(client.isPresent()) {
+
+            try {
+                List<Address> allClientAddresses = client.get().getAllClientAddresses();
+                return new ResponseEntity<>(allClientAddresses, HttpStatus.FOUND);
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            throw new BadCredentialsException("No such client exists!");
+        }
+
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    public ResponseEntity<Void> updateAddress(String username, Address address) {
+        Optional<Client> client = clientJPARepository.findById(username);
+
+        if(client.isPresent()) {
+
+            try {
+                List<Address> allClientAddresses = client.get().getAllClientAddresses();
+                allClientAddresses.get(0).setAddressLine(address.getAddressLine());
+                allClientAddresses.get(0).setCity(address.getCity());
+                allClientAddresses.get(0).setState(address.getState());
+                allClientAddresses.get(0).setPincode(address.getPincode());
+
+                clientJPARepository.save(client.get());
+                return new ResponseEntity<>(HttpStatus.OK);
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            throw new BadCredentialsException("No such client exists!");
+        }
+
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
+    public ResponseEntity<Void> changePassword(String username, Map<String, String> data) {
+        String newPassword = data.get("newPassword");
+        String oldPassword = data.get("oldPassword");
+        Optional<Client> client = clientJPARepository.findById(username);
+
+        if(client.isPresent()) {
+
+            try {
+
+                if(passwordEncoder.matches(oldPassword, client.get().getPassword())) {
+                    System.out.println("Yes they same!");
+                    client.get().setPassword(passwordEncoder.encode(newPassword));
+                    clientJPARepository.save(client.get());
+                    return new ResponseEntity<>(HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.CONFLICT);
+                }
+
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            throw new BadCredentialsException("No such client exists!");
+        }
+
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+
 
 }

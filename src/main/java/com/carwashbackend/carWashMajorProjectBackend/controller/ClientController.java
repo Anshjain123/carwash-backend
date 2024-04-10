@@ -1,6 +1,7 @@
 package com.carwashbackend.carWashMajorProjectBackend.controller;
 
 
+import com.carwashbackend.carWashMajorProjectBackend.entity.Address;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Car;
 import com.carwashbackend.carWashMajorProjectBackend.service.CarService;
 import com.carwashbackend.carWashMajorProjectBackend.service.ClientService;
@@ -27,6 +28,12 @@ public class ClientController {
     @CrossOrigin(origins = "*")
     public ResponseEntity<List<Car>> getAllClientCars(@PathVariable String username) {
         return clientService.getAllClientCars(username);
+    }
+
+    @GetMapping("/client/getClientAddress/{username}")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<List<Address>> getClientAddress(@PathVariable String username) {
+        return clientService.getClientAddress(username);
     }
 
     @GetMapping("client/validateToken")
@@ -61,5 +68,16 @@ public class ClientController {
         System.out.println("newDate " + newDate);
 
         return this.carService.getAllUrls(carNumber, newDate);
+    }
+
+
+
+    @PutMapping("/client/changePassword/{username}")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<Void> updateAdress(@PathVariable String username, @RequestBody Map<String, String> data) {
+        return clientService.changePassword(username, data);
+//        System.out.println(address);
+//        System.out.println(username);
+//        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

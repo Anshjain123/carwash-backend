@@ -26,6 +26,8 @@ public class Car {
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date planValidity;
 
+    private String carLocation;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference("client")
     private Client client;
