@@ -40,4 +40,8 @@ public class Car {
     @JsonManagedReference("carPayment")
     List<Payment> allCarPayments;
 
+    @OneToMany(mappedBy = "car", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference("carRatings")
+    List<Rating> allCarRatings;
+
 }

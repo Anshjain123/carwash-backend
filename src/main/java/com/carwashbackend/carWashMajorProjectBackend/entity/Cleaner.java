@@ -35,9 +35,14 @@ public class Cleaner {
     private String gender;
     private String ImageUrl;
     private String adhaarUrl;
+    private long totalRatings;
+    private long totalRaters;
 
     @OneToMany(mappedBy = "cleaner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JsonManagedReference("cleaner")
     private List<Car> allCleanerCars;
 
+    @OneToMany(mappedBy = "cleaner", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference("cleanerRatings")
+    private List<Rating> allCleanerRatings;
 }

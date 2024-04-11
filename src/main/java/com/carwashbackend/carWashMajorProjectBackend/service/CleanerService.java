@@ -61,7 +61,8 @@ public class CleanerService {
         cleaner.setImageUrl(imageUri);
         cleaner.setAdhaarUrl(adhaarUri);
         cleaner.setPassword(passwordEncoder.encode(cleaner.getPassword()));
-
+        cleaner.setTotalRaters(0);
+        cleaner.setTotalRatings(0);
         cleanerJPARepository.save(cleaner);
         return new ResponseEntity<>("Cleaner added successfully", HttpStatus.CREATED);
 
@@ -127,6 +128,9 @@ public class CleanerService {
         newCleaner.setPhone(cleaner.getPhone());
         newCleaner.setCurrAdd(cleaner.getCurrAdd());
         newCleaner.setPermanentAdd(cleaner.getPermanentAdd());
+        newCleaner.setTotalRatings(cleaner.getTotalRatings());
+        newCleaner.setTotalRaters(cleaner.getTotalRaters());
+        newCleaner.setAllCleanerRatings(cleaner.getAllCleanerRatings());
 //        newCleaner.setPassword(passwordEncoder.encode(cleaner.getPassword()));
 
         try {

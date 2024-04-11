@@ -3,6 +3,7 @@ package com.carwashbackend.carWashMajorProjectBackend.controller;
 
 import com.carwashbackend.carWashMajorProjectBackend.entity.Address;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Car;
+import com.carwashbackend.carWashMajorProjectBackend.entity.Payment;
 import com.carwashbackend.carWashMajorProjectBackend.service.CarService;
 import com.carwashbackend.carWashMajorProjectBackend.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,5 +80,18 @@ public class ClientController {
 //        System.out.println(address);
 //        System.out.println(username);
 //        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    @PostMapping("/client/transactionHistory")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<List<Payment>> transactionHistory(@RequestBody Map<String, String> data) {
+        return this.clientService.TransactionHistory(data);
+    }
+
+    @PostMapping("/client/addRatings")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<String> addRatings(@RequestBody Map<String, String> data) {
+        return this.clientService.addRatings(data);
     }
 }

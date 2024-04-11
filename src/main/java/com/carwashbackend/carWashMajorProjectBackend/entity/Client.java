@@ -41,4 +41,7 @@ public class Client {
     @JsonManagedReference("clientAddresses")
     List<Address> allClientAddresses;
 
+    @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JsonManagedReference("clientRatings")
+    List<Rating> allClientRatings;
 }

@@ -4,6 +4,7 @@ import com.carwashbackend.carWashMajorProjectBackend.entity.*;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CarJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CleanerJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.ClientJPARepository;
+import com.carwashbackend.carWashMajorProjectBackend.repository.RatingJPARepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +32,11 @@ public class ClientService {
 
 
     @Autowired
+    private RatingJPARepository ratingJPARepository;
+    @Autowired
     private PasswordEncoder passwordEncoder;
+
+
 
     public ResponseEntity<String> addClient(Client client) throws ParseException {
 
@@ -143,6 +148,8 @@ public class ClientService {
 //        oldClient.get().setPassword(client.getPassword());
         oldClient.get().setEmail(client.getEmail());
         oldClient.get().setAllClientPayments(client.getAllClientPayments());
+        oldClient.get().setAllClientRatings(client.getAllClientRatings());
+
         List<Car> allCars = client.getAllClientCars();
 
         for(int i = 0; i < allCars.size(); i++) {
@@ -261,5 +268,91 @@ public class ClientService {
     }
 
 
+    public ResponseEntity<List<Payment>> TransactionHistory(Map<String, String> data) {
+
+        String carNumber = data.get("carNumber");
+        String username = data.get("username");
+
+        Optional<Client> client = clientJPARepository.findById(username);
+        if(client.isPresent()) {
+
+            try {
+                List<Payment> allClientPayments = client.get().getAllClientPayments();
+                List<Payment> res = new ArrayList<>();
+
+                for(int i = 0; i < allClientPayments.size(); i++) {
+                    if(allClientPayments.get(i).getCar().getCarNumber().equals(carNumber)) {
+                        res.add(allClientPayments.get(i));
+                    }
+                }
+
+                return new ResponseEntity<>(res, HttpStatus.OK);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    public String getDate() {
+        String pattern = "dd-MM-yyyy";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+
+        String date = simpleDateFormat.format(new Date());
+        return date;
+    }
+    public ResponseEntity<String> addRatings(Map<String, String> data) {
+        try {
+            System.out.println("Yes we are coming here in add Ratings");
+            String carNumber = data.get("carNumber");
+            // fetching client
+            String username = data.get("username");
+            Optional<Car> car = carJPARepository.findById(carNumber);
+            if(car.isPresent()) {
+                Cleaner cleaner = car.get().getCleaner();
+                if(cleaner == null) {
+                    return new ResponseEntity<>("Cleaner is null", HttpStatus.NOT_FOUND);
+                }
+                Optional<Client> client = clientJPARepository.findById(username);
+                long rating = Long.parseLong(data.get("rating"));
+
+                cleaner.setTotalRatings(cleaner.getTotalRatings() + rating);
+                cleaner.setTotalRaters(cleaner.getTotalRaters() + 1);
+
+
+                String date = getDate();
+
+                Rating rating1 = new Rating();
+                rating1.setRating(rating);
+                rating1.setDate(date);
+                rating1.setCleaner(cleaner);
+                rating1.setClient(client.get());
+                rating1.setCar(car.get());
+                ratingJPARepository.save(rating1);
+
+                List<Rating> allCleanerRatings = cleaner.getAllCleanerRatings();
+                allCleanerRatings.add(rating1);
+
+                List<Rating> allClientRatings = client.get().getAllClientRatings();
+                allClientRatings.add(rating1);
+
+                List<Rating> allCarRatings = car.get().getAllCarRatings();
+                allCarRatings.add(rating1);
+
+                clientJPARepository.save(client.get());
+                cleanerJPARepository.save(cleaner);
+                carJPARepository.save(car.get());
+                return new ResponseEntity<>("rating added successfully", HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 
 }
