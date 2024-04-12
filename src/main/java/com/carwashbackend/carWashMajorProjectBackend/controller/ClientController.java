@@ -75,8 +75,17 @@ public class ClientController {
 
     @PutMapping("/client/changePassword/{username}")
     @CrossOrigin(origins = "*")
-    public ResponseEntity<Void> updateAdress(@PathVariable String username, @RequestBody Map<String, String> data) {
+    public ResponseEntity<Void> updatePassword(@PathVariable String username, @RequestBody Map<String, String> data) {
         return clientService.changePassword(username, data);
+//        System.out.println(address);
+//        System.out.println(username);
+//        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/client/updateAddress/{username}")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<Void> updateAddress(@PathVariable String username, @RequestBody Address address) {
+        return clientService.updateAddress(username, address);
 //        System.out.println(address);
 //        System.out.println(username);
 //        return new ResponseEntity<>(HttpStatus.OK);

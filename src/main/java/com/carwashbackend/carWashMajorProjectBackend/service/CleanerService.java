@@ -1,10 +1,7 @@
 package com.carwashbackend.carWashMajorProjectBackend.service;
 
 
-import com.carwashbackend.carWashMajorProjectBackend.entity.Car;
-import com.carwashbackend.carWashMajorProjectBackend.entity.Cleaner;
-import com.carwashbackend.carWashMajorProjectBackend.entity.WashedCarMedia;
-import com.carwashbackend.carWashMajorProjectBackend.entity.WashedCarMediaExteriorAndInterior;
+import com.carwashbackend.carWashMajorProjectBackend.entity.*;
 import com.carwashbackend.carWashMajorProjectBackend.repository.CleanerJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.WashedCarMediaExteriorAndInteriorRepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.WashedCarMediaRepository;
@@ -15,6 +12,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -297,5 +295,88 @@ public class CleanerService {
         }
     }
 
+    public ResponseEntity<Void> updateAddress(Map<String, String> data) {
+        String username = data.get("username");
+        Optional<Cleaner> cleaner = cleanerJPARepository.findById(username);
 
+        if(cleaner.isPresent()) {
+
+            try {
+
+                String newCurrentAddress = data.get("currentAddress");
+                String newPermanentAddress = data.get("permanentAddress");
+
+                cleaner.get().setCurrAdd(newCurrentAddress);
+                cleaner.get().setPermanentAdd(newPermanentAddress);
+                cleanerJPARepository.save(cleaner.get());
+
+                return new ResponseEntity<>(HttpStatus.OK);
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            throw new BadCredentialsException("No such client exists!");
+        }
+
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    public ResponseEntity<Void> changePassword(Map<String, String> data) {
+//        System.out.println("Yes password coming change");
+        String newPassword = data.get("newPassword");
+        String oldPassword = data.get("oldPassword");
+        String username = data.get("username");
+        Optional<Cleaner> cleaner = cleanerJPARepository.findById(username);
+
+        if(cleaner.isPresent()) {
+
+            try {
+//                System.out.println("Yes comint here");
+                System.out.println(oldPassword);
+                if(passwordEncoder.matches(oldPassword, cleaner.get().getPassword())) {
+                    System.out.println("Yes they same!");
+                    cleaner.get().setPassword(passwordEncoder.encode(newPassword));
+                    cleanerJPARepository.save(cleaner.get());
+                    return new ResponseEntity<>(HttpStatus.OK);
+                } else {
+                    return new ResponseEntity<>(HttpStatus.CONFLICT);
+                }
+
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            throw new BadCredentialsException("No such client exists!");
+        }
+
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    public ResponseEntity<Map<String, String>> getCleanerAddress(String username) {
+        Optional<Cleaner> cleaner = cleanerJPARepository.findById(username);
+
+        if(cleaner.isPresent()) {
+
+            try {
+                String currAdd = cleaner.get().getCurrAdd();
+                String permanentAdd = cleaner.get().getPermanentAdd();
+
+                Map<String, String> res = new HashMap<>();
+                res.put("currAdd", currAdd);
+                res.put("permanentAdd", permanentAdd);
+
+                System.out.println(res);
+                return new ResponseEntity<>(res, HttpStatus.OK);
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            throw new BadCredentialsException("No such client exists!");
+        }
+
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

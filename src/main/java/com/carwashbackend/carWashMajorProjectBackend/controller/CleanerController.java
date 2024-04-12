@@ -1,6 +1,7 @@
 package com.carwashbackend.carWashMajorProjectBackend.controller;
 
 
+import com.carwashbackend.carWashMajorProjectBackend.entity.Address;
 import com.carwashbackend.carWashMajorProjectBackend.entity.Car;
 import com.carwashbackend.carWashMajorProjectBackend.service.CleanerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,6 +80,30 @@ public class CleanerController {
     }
 
 
+    @GetMapping("/cleaner/getCleanerAddress/{username}")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<Map<String, String>> getCleanerAddress(@PathVariable String username) {
+        System.out.println("Yes iske andr to arrrra");
+        return cleanerService.getCleanerAddress(username);
+    }
+
+    @PutMapping("/cleaner/changePassword")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<Void> updatePassword(@RequestBody Map<String, String> data) {
+        return cleanerService.changePassword(data);
+//        System.out.println(address);
+//        System.out.println(username);
+//        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @PutMapping("/cleaner/updateAddress")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<Void> updateAddress(@RequestBody Map<String, String> data) {
+        return cleanerService.updateAddress(data);
+//        System.out.println(address);
+//        System.out.println(username);
+//        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 
 }
