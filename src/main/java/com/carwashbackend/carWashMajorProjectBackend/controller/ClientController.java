@@ -103,4 +103,31 @@ public class ClientController {
     public ResponseEntity<String> addRatings(@RequestBody Map<String, String> data) {
         return this.clientService.addRatings(data);
     }
+
+    @GetMapping("login/client/getotp/{username}")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<Void> getOtp(@PathVariable String username) {
+        System.out.println("Yes iske andr to arrrra");
+//        String username = data.get("username");
+//        System.out.println(username);
+        return clientService.isUserValid(username);
+    }
+
+    @PostMapping("login/client/validateOtp")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<String> getOvalidateOtptp(@RequestBody Map<String, String> data) {
+        System.out.println("Yes iske andr to ara");
+//        String username = data.get("username");
+//        System.out.println(username);
+        return clientService.isValidOtp(data);
+    }
+
+
+    @PostMapping("login/client/changePassword")
+    @CrossOrigin(origins = "*")
+    public ResponseEntity<String> changePasswordlogin(@RequestBody Map<String, String> data) {
+        System.out.println("Yes login cahngepassword");
+        return clientService.changePasswordLogin(data);
+    }
+
 }

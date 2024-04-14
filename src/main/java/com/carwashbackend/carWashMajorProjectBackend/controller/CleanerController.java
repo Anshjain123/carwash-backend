@@ -105,7 +105,7 @@ public class CleanerController {
 //        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping("login/getotp/{username}")
+    @GetMapping("login/cleaner/getotp/{username}")
     @CrossOrigin(origins = "*")
     public ResponseEntity<Void> getOtp(@PathVariable String username) {
         System.out.println("Yes iske andr to arrrra");
@@ -114,7 +114,7 @@ public class CleanerController {
         return cleanerService.isUserValid(username);
     }
 
-    @PostMapping("login/validateOtp")
+    @PostMapping("login/cleaner/validateOtp")
     @CrossOrigin(origins = "*")
     public ResponseEntity<String> getOvalidateOtptp(@RequestBody Map<String, String> data) {
         System.out.println("Yes iske andr to arrrra");
@@ -124,7 +124,7 @@ public class CleanerController {
     }
 
 
-    @PostMapping("login/changePassword")
+    @PostMapping("login/cleaner/changePassword")
     @CrossOrigin(origins = "*")
     public ResponseEntity<String> changePasswordlogin(@RequestBody Map<String, String> data) {
         System.out.println("Yes login cahngepassword");

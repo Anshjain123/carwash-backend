@@ -49,7 +49,7 @@ public class MailService {
         }
         System.out.println("Yes in mail service it is coming!");
         String to = car.get().getClient().getEmail();
-        String from = "jainansh2510@gmail.com";
+        String from = "majorp1apl@gmail.com";
         String subject = "renew the subscription";
         String planValidity = String.valueOf(car.get().getPlanValidity());
         String message = "Dear customer your car wash plan for carnumber " + carNumber + " is going to expire on " + planValidity + " kindly renew it at earliest to get the best washing services at door step";

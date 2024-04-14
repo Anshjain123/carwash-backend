@@ -1,10 +1,7 @@
 package com.carwashbackend.carWashMajorProjectBackend.service;
 
 import com.carwashbackend.carWashMajorProjectBackend.entity.*;
-import com.carwashbackend.carWashMajorProjectBackend.repository.CarJPARepository;
-import com.carwashbackend.carWashMajorProjectBackend.repository.CleanerJPARepository;
-import com.carwashbackend.carWashMajorProjectBackend.repository.ClientJPARepository;
-import com.carwashbackend.carWashMajorProjectBackend.repository.RatingJPARepository;
+import com.carwashbackend.carWashMajorProjectBackend.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -36,6 +35,8 @@ public class ClientService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private ClientotpJPARepository clientotpJPARepository;
 
     @Autowired
     private MailService mailService;
@@ -381,4 +382,148 @@ public class ClientService {
         return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
+
+    public ResponseEntity<Void> isUserValid(String email) {
+//        System.out.println("Yes is uservalid " + username);
+
+        Optional<Client> client = clientJPARepository.findByemail(email);
+//        System.out.println("yes it is valid");
+
+        if(client.isPresent()) {
+            String username = client.get().getPhone();
+            sendOtp(username);
+            return new ResponseEntity<>(HttpStatus.FOUND);
+        }
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+
+    public static String generateOtp() {
+        // Generate a random 5-digit OTP
+        Random random = new Random();
+        int otp = 10000 + random.nextInt(90000); // Generates a random number between 10000 and 99999
+        return String.valueOf(otp);
+    }
+
+    public static LocalDateTime calculateExpiryTime() {
+        // Calculate expiry time as current time + 5 minutes
+        return LocalDateTime.now().plusMinutes(5);
+    }
+
+    private String composeOtpMessage(String user, String otp) {
+        return "<!DOCTYPE html>"
+                + "<html lang=\"en\">"
+                + "<head>"
+                + "<meta charset=\"UTF-8\">"
+                + "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
+                + "<title>OTP Email</title>"
+                + "<style>"
+                + "body { font-family: Arial, sans-serif; background-color: #f5f5f5; color: #333; }"
+                + ".container { max-width: 600px; margin: 0 auto; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }"
+                + "h1 { color: #007bff; }"
+                + "p { font-size: 16px; line-height: 1.5; }"
+                + ".otp { font-size: 24px; font-weight: bold; color: #28a745; }"
+                + "</style>"
+                + "</head>"
+                + "<body>"
+                + "<div class=\"container\">"
+                + "<h1>Verify Your Account</h1>"
+                + "<p>Hello " + user + ",</p>"
+                + "<p>To complete your verification process, please use the following OTP:</p>"
+                + "<p class=\"otp\">" + otp + "</p>"
+                + "<p>This OTP is valid for 5 minutes only. Please do not share it with anyone for security reasons.</p>"
+                + "<p>If you did not request this OTP, please ignore this message.</p>"
+                + "<p>Best regards,<br>Washify</p>"
+                + "</div>"
+                + "</body>"
+                + "</html>";
+    }
+
+    public void sendOtp(String username) {
+
+        System.out.println("uyes yaahan bhi valid h" + username);
+        Optional<Client> client= clientJPARepository.findById(username);
+
+        if(client.isPresent()) {
+            String otp = generateOtp();
+            LocalDateTime expiryTime = calculateExpiryTime();
+
+            System.out.println(client.get().getEmail());
+            String from = "majorp1apl@gmail.com";
+            String to = client.get().getEmail();
+            String subject = "Otp for password change ";
+            String message = composeOtpMessage(client.get().getEmail(), otp);
+            mailService.send(from, to, message, subject);
+
+            // store the otp
+            Optional<Clientotp> clientotp = clientotpJPARepository.findById(client.get().getEmail());
+//            Cleanerotp cleanerotp = cleanerotpJPARepository.findBycleanerUsername(cleaner.get().getEmail());
+            if(!clientotp.isPresent()) {
+                Clientotp clientotp1 = new Clientotp();
+                clientotp1.setClientUsername(username);
+                clientotp1.setOtp(otp);
+                clientotp1.setExpiresAt(expiryTime);
+                clientotpJPARepository.save(clientotp1);
+
+            } else {
+                clientotp.get().setExpiresAt(expiryTime);
+                clientotp.get().setOtp(otp);
+                clientotpJPARepository.save(clientotp.get());
+            }
+        }
+    }
+
+    public ResponseEntity<String> isValidOtp(Map<String, String> data) {
+        String email = data.get("username");
+        Optional<Client> client = clientJPARepository.findByemail(email);
+
+        if(client.isPresent()) {
+            String username = client.get().getPhone();
+            Optional<Clientotp> clientotp = clientotpJPARepository.findById(username);
+//        System.out.println(username);
+            if(clientotp.isPresent()) {
+
+                String userOtp = data.get("otp");
+                if(userOtp.equals(clientotp.get().getOtp())) {
+
+                    LocalDateTime nowTime = LocalDateTime.now();
+                    Duration duration = Duration.between(clientotp.get().getExpiresAt(), nowTime);
+
+                    if (duration.getSeconds() <= 5 * 60) {
+
+                        System.out.println("The difference is not more than 5 minutes.");
+
+                        return new ResponseEntity<>("OTP is valid", HttpStatus.OK);
+                    } else {
+                        System.out.println("The difference is more than 5 minutes.");
+                        return new ResponseEntity<>("OTP is expired", HttpStatus.CONFLICT);
+                    }
+                }
+
+
+                return new ResponseEntity<>("Wrong Otp", HttpStatus.CONFLICT);
+            }
+
+        }
+
+
+        return new ResponseEntity<>("No such user exists", HttpStatus.NOT_FOUND);
+    }
+
+    public ResponseEntity<String> changePasswordLogin(Map<String, String> data) {
+
+        String username = data.get("username");
+        Optional<Client> client = clientJPARepository.findByemail(username);
+        if(client.isPresent()) {
+            try {
+
+                String newPassword = data.get("newPassword");
+                client.get().setPassword(passwordEncoder.encode(newPassword));
+                clientJPARepository.save(client.get());
+                return new ResponseEntity<>("Password changed succesfully", HttpStatus.OK);
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+            }
+        }
+        return new ResponseEntity<>("User not present", HttpStatus.NOT_FOUND);
+    }
 }

@@ -190,7 +190,7 @@ public class PaymentService {
         }
 
         String clientMail = client.getEmail();
-        String adminMail = "jainansh2510@gmail.com";
+        String adminMail = "majorp1apl@gmail.com";
 
         List<Payment> allClientPayments = client.getAllClientPayments();
         Payment payment = null;
