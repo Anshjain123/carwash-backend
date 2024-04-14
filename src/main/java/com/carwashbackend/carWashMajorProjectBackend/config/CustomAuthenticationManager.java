@@ -51,14 +51,14 @@ public class CustomAuthenticationManager implements AuthenticationManager {
             if(cleaner.isPresent()) {
                 boolean flag = passwordEncoder.matches(authentication.getCredentials().toString(), cleaner.get().getPassword());
                 System.out.println(flag);
-                if(flag == true) {
+                if(flag) {
                     System.out.println("Yes password are same");
                     List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
                     UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(), authentication.getCredentials(), authorities);
 //
                     return newAuthentication;
                 } else {
-//                    System.out.println("wrong");
+                    System.out.println("wrong");
                     throw new BadCredentialsException("Wrong password!");
                 }
             } else {

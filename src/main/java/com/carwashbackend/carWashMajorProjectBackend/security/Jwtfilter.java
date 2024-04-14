@@ -139,7 +139,10 @@ public class Jwtfilter extends OncePerRequestFilter {
                 }
             }
             System.out.println("Yaha tk to sb thik hi lgra h");
+            filterChain.doFilter(request, response);
+        } else {
+            System.out.println("Yes not requiered header!");
+            filterChain.doFilter(request, response);
         }
-        filterChain.doFilter(request, response);
     }
 }

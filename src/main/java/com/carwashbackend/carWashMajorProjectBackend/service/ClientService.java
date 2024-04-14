@@ -37,6 +37,8 @@ public class ClientService {
     private PasswordEncoder passwordEncoder;
 
 
+    @Autowired
+    private MailService mailService;
 
     public ResponseEntity<String> addClient(Client client) throws ParseException {
 
@@ -98,6 +100,10 @@ public class ClientService {
             List<Payment> allClientPayments = car.get().getAllCarPayments();
             for(int i = 0; i < allClientPayments.size(); i++) {
                 allClientPayments.get(i).setClient(null);
+            }
+            List<Rating> allCarRatings = car.get().getAllCarRatings();
+            for(int i = 0; i < allCarRatings.size(); i++) {
+                allCarRatings.get(i).setClient(null);
             }
 
             Cleaner cleaner = car.get().getCleaner();
@@ -224,7 +230,27 @@ public class ClientService {
                 allClientAddresses.get(0).setState(address.getState());
                 allClientAddresses.get(0).setPincode(address.getPincode());
 
-                clientJPARepository.save(client.get());
+                try {
+
+                    clientJPARepository.save(client.get());
+
+                    String from = "majorp1apl@gmail.com";
+                    String to = client.get().getEmail();
+                    String subject = "Address changed by cleaner " + client.get().getName();
+                    String message = "<html><body>" +
+                            "<h1 style='color: #5e9ca0;'>Hello Admin,</h1>" +
+                            "<p style='color: #5e9ca0;'>A Cleaner has recently changed his address.</p>" +
+                            "<p style='color: #5e9ca0;'>Here's Cleaner information:</p>" +
+                            "<p>" + "client name -> " + client.get().getName() + "</p>" +
+                            "<p>" + "client phone -> " + client.get().getPhone() + "</p>" +
+                            "<p style='color: #5e9ca0;'>If you think this was a mistake kindly contact client as soon as possible</p>" +
+                            "<p style='color: #5e9ca0;'>Thank you for your attention.</p>" +
+                            "<p style='color: #5e9ca0;'>Best regards,<br>Washify team</p>" +
+                            "</body></html>";
+                    mailService.send(from, to, message, subject);
+                } catch (RuntimeException e) {
+                    e.printStackTrace();
+                }
                 return new ResponseEntity<>(HttpStatus.OK);
             } catch (RuntimeException e) {
                 e.printStackTrace();

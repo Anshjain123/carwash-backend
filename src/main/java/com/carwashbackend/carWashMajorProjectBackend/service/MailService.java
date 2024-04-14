@@ -104,14 +104,12 @@ public class MailService {
         MimeMessage mimeMessage = new MimeMessage(instance);
 
 
-
         try {
             mimeMessage.setFrom(from);
             mimeMessage.addRecipient(Message.RecipientType.TO, new InternetAddress(to));
             mimeMessage.setSubject(subject);
-            mimeMessage.setText(message);
-
-
+//            mimeMessage.setText(message);
+            mimeMessage.setContent(message, "text/html");
             // step 3 -> send the message
 
             Transport.send(mimeMessage);

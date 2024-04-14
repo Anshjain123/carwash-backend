@@ -221,7 +221,17 @@ public class PaymentService {
 
         String from = adminMail;
         String to = clientMail;
-        String message = "Thank you for again choding us for you car washing services your payment for " + carNumber + " is completed your now plan for this car will expire on " + increasedDate;
+        String message = "<html><body>" +
+                "<h1 style='color: #5e9ca0;'>Hello Client,</h1>" +
+                "<p style='color: #5e9ca0;'>Welcome Back</p>" +
+                "<p style='color: #5e9ca0;'>Your payment for car Number:</p>" +
+                "<p>" + carNumber + "</p>" +
+                "<p style='color: #5e9ca0;'>has completed!</p>" +
+                "<p style='color: #5e9ca0;'>Your plan has now extended till:</p>" +
+                "<p>" + car.get().getPlanValidity() + "</p>" +
+                "<p style='color: #5e9ca0;'>Thank you for choosing our services again!:</p>" +
+                "<p style='color: #5e9ca0;'>Best regards,<br>Your Name</p>" +
+                "</body></html>";
         String subject = "Payment for carwash service succeed";
 
         return sendMail(from, to, message, subject);
