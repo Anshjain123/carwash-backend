@@ -7,20 +7,28 @@ import com.carwashbackend.carWashMajorProjectBackend.repository.CleanerJPAReposi
 import com.carwashbackend.carWashMajorProjectBackend.repository.CleanerotpJPARepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.WashedCarMediaExteriorAndInteriorRepository;
 import com.carwashbackend.carWashMajorProjectBackend.repository.WashedCarMediaRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -189,8 +197,12 @@ public class CleanerService {
     }
 
 
+
+
+
     public String getURI(List<String> files, String carNumber) throws IOException {
         int n = files.size();
+
 
         String date = getDate();
 
@@ -211,6 +223,11 @@ public class CleanerService {
             cnt++;
             String destination = storageDirectory + "\\" + fileName;
             byte[] imageBytes = Base64.getDecoder().decode(files.get(i));
+
+
+
+
+
             Files.copy(new ByteArrayInputStream(imageBytes), Path.of(destination));
 
             String uri = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -238,7 +255,71 @@ public class CleanerService {
         String date = simpleDateFormat.format(new Date());
         return date;
     }
-    public void addWashedCarMedia(List<String> files, String carNumber) throws IOException {
+
+
+    public String getPlateNumber(String base64Image) throws JsonProcessingException {
+        Map<String, String> body = new HashMap<>();
+        body.put("upload", base64Image);
+//        body.put("regions", "us-ca");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Token cd3f07703b175ef9a69e27ba587d1c8752d7a8e3");
+
+        HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(body, headers);
+
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.postForEntity("https://api.platerecognizer.com/v1/plate-reader/", requestEntity, String.class);
+
+        String responseBody = response.getBody();
+
+//        System.out.println(responseBody);
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        // Convert JSON string to JsonNode
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+
+        var results = jsonNode.get("results");
+        if(response.hasBody() && results.size() > 0) {
+
+            try {
+                String plateNumber = results.get(0).get("plate").toString();
+                return plateNumber;
+            } catch (RuntimeException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+        return "";
+
+    }
+
+    public boolean checkCarNumber(List<String> files, String carNumber) throws JsonProcessingException {
+
+        String lowerCaseCarNumber = carNumber.toLowerCase();
+        // trying to apply the dip model
+
+        for(int i = 0; i < files.size(); i++) {
+
+            String res = getPlateNumber(files.get(i)).toLowerCase();
+            if(res.length() > 0) {
+
+                String plateNumber = res.substring(1, res.length()-1);
+                System.out.println(i);
+                System.out.println(plateNumber);
+                System.out.println(lowerCaseCarNumber);
+                if(plateNumber.equals(lowerCaseCarNumber)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+
+    }
+    public ResponseEntity<String> addWashedCarMediaExt(List<String> files, String carNumber) throws IOException {
+
+        if(!checkCarNumber(files, carNumber)) {
+            return new ResponseEntity<>("Cannot upload files because carNumber plate is not correct", HttpStatus.CONFLICT);
+        }
 
 
         String URI = getURI(files, carNumber);
@@ -252,9 +333,14 @@ public class CleanerService {
 //        WashedCarMedia washedCarMedia1 = washedCarMediaRepository.findBycarNumber(carNumber);
 //
 //        System.out.println(washedCarMedia1);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    public void addWashedCarMedia(List<String> ExtFiles, List<String> IntFiles, String carNumber) throws IOException {
+    public ResponseEntity<String> addWashedCarMedia(List<String> ExtFiles, List<String> IntFiles, String carNumber) throws IOException {
+
+        if(!checkCarNumber(ExtFiles, carNumber)) {
+            return new ResponseEntity<>("Cannot upload files because carNumber plate is not correct", HttpStatus.CONFLICT);
+        }
 
         String ExtURI = getURI(ExtFiles, carNumber);
         String IntURI = getURI(IntFiles, carNumber);
@@ -268,6 +354,8 @@ public class CleanerService {
         washedCarMediaExteriorAndInterior.setCarNumber(carNumber);
 
         washedCarMediaExteriorAndInteriorRepository.save(washedCarMediaExteriorAndInterior);
+
+        return new ResponseEntity<>(HttpStatus.OK);
 
     }
 

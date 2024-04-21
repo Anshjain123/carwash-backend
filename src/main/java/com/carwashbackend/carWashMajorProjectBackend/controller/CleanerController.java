@@ -33,14 +33,12 @@ public class CleanerController {
 
     @PostMapping("/cleaner/postMedia")
     @CrossOrigin(origins = "*")
-    public ResponseEntity<Void> postMedia(@RequestBody Map<Object, Object> mp) throws IOException {
+    public ResponseEntity<String> postMedia(@RequestBody Map<Object, Object> mp) throws IOException {
 //        System.out.println(li);
 
         List<String> li = (List<String>) mp.get("allImagesData");
         String carNumber = (String) mp.get("carNumber");
-        cleanerService.addWashedCarMedia(li, carNumber);
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        return cleanerService.addWashedCarMediaExt(li, carNumber);
     }
 
     @GetMapping("/cleaner/validateToken")
@@ -50,15 +48,14 @@ public class CleanerController {
     }
     @PostMapping("/cleaner/postMediaExtAndInt")
     @CrossOrigin(origins = "*")
-    public ResponseEntity<Void> postMediaExtAndInt(@RequestBody Map<Object, Object> mp) throws IOException {
+    public ResponseEntity<String> postMediaExtAndInt(@RequestBody Map<Object, Object> mp) throws IOException {
 //        System.out.println(li);
 
         List<String> ExtFiles = (List<String>) mp.get("extFiles");
         List<String> IntFiles = (List<String>) mp.get("intFiles");
         String carNumber = (String) mp.get("carNumber");
-        cleanerService.addWashedCarMedia(ExtFiles, IntFiles, carNumber);
+        return cleanerService.addWashedCarMedia(ExtFiles, IntFiles, carNumber);
 
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 

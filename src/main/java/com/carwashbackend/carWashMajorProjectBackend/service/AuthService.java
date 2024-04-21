@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +58,7 @@ public class AuthService {
         } else {
             userDetails = clientDetailServiceImp.loadUserByUsername(username);
         }
-
+    
         String token = helper.generateToken(userDetails, type);
 
         JwtResponse response = JwtResponse.builder().jwtToken(token).username(userDetails.getUsername()).build();
