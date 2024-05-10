@@ -200,7 +200,7 @@ public class CleanerService {
 
 
 
-    public String getURI(List<String> files, String carNumber) throws IOException {
+    public String getURI(List<String> files, String carNumber, int cnt) throws IOException {
         int n = files.size();
 
 
@@ -217,16 +217,13 @@ public class CleanerService {
         List<String> uris = new ArrayList<>();
         String URI = "";
 
-
+        cnt = 11;
         for(int i = 0; i < n; i++) {
-            String fileName = "image" + cnt + carNumber;
+            String uniqueId = UUID.randomUUID().toString();
+            String fileName = "image" + uniqueId + '@' + date + '$' + carNumber;
             cnt++;
             String destination = storageDirectory + "\\" + fileName;
             byte[] imageBytes = Base64.getDecoder().decode(files.get(i));
-
-
-
-
 
             Files.copy(new ByteArrayInputStream(imageBytes), Path.of(destination));
 
@@ -322,7 +319,7 @@ public class CleanerService {
         }
 
 
-        String URI = getURI(files, carNumber);
+        String URI = getURI(files, carNumber, 0);
         String date = getDate();
         WashedCarMedia washedCarMedia = new WashedCarMedia();
         washedCarMedia.setURI(URI);
@@ -342,8 +339,8 @@ public class CleanerService {
             return new ResponseEntity<>("Cannot upload files because carNumber plate is not correct", HttpStatus.CONFLICT);
         }
 
-        String ExtURI = getURI(ExtFiles, carNumber);
-        String IntURI = getURI(IntFiles, carNumber);
+        String ExtURI = getURI(ExtFiles, carNumber, 0);
+        String IntURI = getURI(IntFiles, carNumber, 5);
         String date = getDate();
 
         WashedCarMediaExteriorAndInterior washedCarMediaExteriorAndInterior = new WashedCarMediaExteriorAndInterior();
@@ -360,19 +357,36 @@ public class CleanerService {
     }
 
     public byte[] getMedia(String filename) throws IOException {
-        String carNumber = filename.substring(6);
-        String date = getDate();
+        int startIdx = 0;
+        int endIdx = 0;
+        for(int i = startIdx; i < filename.length(); i++) {
+            if(filename.charAt(i) == '@') {
+                startIdx = i+1;
+//                break;
+            } else if(filename.charAt(i) == '$'){
+                endIdx = i+1;
+                break;
+            }
+        }
+        System.out.println(filename);
+        System.out.println("startIdx");
+        System.out.println(startIdx);
+        String carNumber = filename.substring(endIdx);
+        String date = filename.substring(startIdx, endIdx-1);
 
         String directory = "uploadMedia/" + date + "/" + carNumber;
 //        String directory = "uploadMedia/" + ;
+        System.out.println(directory);
         Path storageDirectory = Path.of(directory);
         if(!Files.exists(storageDirectory)) {
             return null;
         }
+        System.out.println("Yes dir present!");
 
         Path destination = Path.of(storageDirectory + "\\" + filename);
         byte[] data = Files.readAllBytes(destination);
-//        System.out.println(data);
+        System.out.println("data");
+        System.out.println(data);
         return data;
     }
 

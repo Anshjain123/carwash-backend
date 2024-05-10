@@ -144,9 +144,10 @@ public class CarService {
         try {
 //            String URI = washedCarMediaRepository.findBycarNumberAndDate(carNumber, date);
             List<WashedCarMedia> washedCars = washedCarMediaRepository.findByDate(date);
+//            System.out.println(washedCars);
             String URI = "";
             for(int i = 0; i < washedCars.size(); i++) {
-                if(washedCars.get(i).getDate().equals(date)) {
+                if(washedCars.get(i).getCarNumber().equals(carNumber)) {
                     URI = washedCars.get(i).getURI();
                     break;
                 }
@@ -160,7 +161,7 @@ public class CarService {
                 String ExtURI = "";
                 String IntURI = "";
                 for(int i = 0; i < washedCarMediaExteriorAndInteriors.size(); i++) {
-                    if(washedCarMediaExteriorAndInteriors.get(i).getDate().equals(date)) {
+                    if(washedCarMediaExteriorAndInteriors.get(i).getCarNumber().equals(carNumber)) {
                         ExtURI = washedCarMediaExteriorAndInteriors.get(i).getExtURI();
                         IntURI = washedCarMediaExteriorAndInteriors.get(i).getIntURI();
                         break;
@@ -198,7 +199,7 @@ public class CarService {
                 System.out.println(uris);
             }
 
-
+            System.out.println("Yes comming herrrrree!");
             return new ResponseEntity<>(uris, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

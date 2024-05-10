@@ -236,12 +236,12 @@ public class ClientService {
                     clientJPARepository.save(client.get());
 
                     String from = "majorp1apl@gmail.com";
-                    String to = client.get().getEmail();
-                    String subject = "Address changed by cleaner " + client.get().getName();
+                    String to = "jainansh2510@gmail.com";
+                    String subject = "Address changed by client " + client.get().getName();
                     String message = "<html><body>" +
                             "<h1 style='color: #5e9ca0;'>Hello Admin,</h1>" +
-                            "<p style='color: #5e9ca0;'>A Cleaner has recently changed his address.</p>" +
-                            "<p style='color: #5e9ca0;'>Here's Cleaner information:</p>" +
+                            "<p style='color: #5e9ca0;'>A Client has recently changed his address.</p>" +
+                            "<p style='color: #5e9ca0;'>Here's Client information:</p>" +
                             "<p>" + "client name -> " + client.get().getName() + "</p>" +
                             "<p>" + "client phone -> " + client.get().getPhone() + "</p>" +
                             "<p style='color: #5e9ca0;'>If you think this was a mistake kindly contact client as soon as possible</p>" +

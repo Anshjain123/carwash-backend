@@ -10,8 +10,10 @@ import com.carwashbackend.carWashMajorProjectBackend.repository.PaymentJPAReposi
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
+import com.stripe.model.EphemeralKey;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.CustomerCreateParams;
+import com.stripe.param.EphemeralKeyCreateParams;
 import com.stripe.param.PaymentIntentCreateParams;
 import org.apache.coyote.Response;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,18 +68,20 @@ public class PaymentService {
         }
 
         String name = client.getName();
-        String city = client.getAddress();
-
+        String addressLine = client.getAllClientAddresses().get(0).getAddressLine();
+        String postalCode = client.getAllClientAddresses().get(0).getPincode();
+        String city = client.getAllClientAddresses().get(0).getCity();
+        String state = client.getAllClientAddresses().get(0).getState();
         CustomerCreateParams params =
                 CustomerCreateParams.builder()
                         .setName(name)
                         .setAddress(
                                 CustomerCreateParams.Address.builder()
-                                        .setLine1("510 Townsend St")
-                                        .setPostalCode("98140")
+                                        .setLine1(addressLine)
+                                        .setPostalCode(postalCode)
                                         .setCity(city)
-                                        .setState("CA")
-                                        .setCountry("US")
+                                        .setState(state)
+                                        .setCountry("IN")
 
                                         .build()
                         )
@@ -86,6 +90,13 @@ public class PaymentService {
 
         Customer customer = Customer.create(params);
         System.out.println("printing customer " + customer);
+        EphemeralKeyCreateParams ephemeralKeyParams =
+                EphemeralKeyCreateParams.builder()
+                        .setStripeVersion("2023-10-16")
+                        .setCustomer(customer.getId())
+                        .build();
+
+        EphemeralKey ephemeralKey = EphemeralKey.create(ephemeralKeyParams);
         PaymentIntentCreateParams Params =
                 PaymentIntentCreateParams.builder()
                         .setAmount((long) amount)
@@ -106,6 +117,8 @@ public class PaymentService {
         Map<String, String> res = new HashMap<>();
         res.put("clientSecret", clientSecret);
         res.put("id", paymentIntent.getId());
+        res.put("ephemeralKey", ephemeralKey.getSecret());
+        res.put("customer", customer.getId());
         System.out.println("res -> " + res);
 //        System.out.println(res.get("clientSecret"));
 

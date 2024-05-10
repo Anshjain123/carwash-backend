@@ -27,7 +27,7 @@ public class WashedCarMedia {
 //    @Json
 //    private List<String> uris;
 
-    @Column(length = 500)
+    @Column(length = 1000)
     private String URI;
 
     private String carNumber;
